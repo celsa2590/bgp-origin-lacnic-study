@@ -1,0 +1,11 @@
+# Datos grandes y no versionables
+colectores/
+delegated_lacnic/
+outputs/
+stats/
+
+# Temporales
+*.bz2
+*.txt
+*.log
+__pycache__/
