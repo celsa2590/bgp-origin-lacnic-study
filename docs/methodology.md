@@ -22,7 +22,6 @@ El objetivo principal es garantizar que el estudio sea **reproducible**, **audit
 - Perspectiva:
   - Por colector
   - Por país (CC)
-  - Comparación entre colectores
 
 ---
 
@@ -128,10 +127,15 @@ Ejemplo de ejecución:
 Salida:
 
 outputs/RIS_UY_lacnic_txt/
+
 ├── ribuy_2501.txt.lacnic.v4.txt
+
 ├── ribuy_2501.txt.lacnic.v6.txt
+
 ├── ribuy_2502.txt.lacnic.v4.txt
+
 ├── ribuy_2502.txt.lacnic.v6.txt
+
 └── ...
 
 ## 7. Cálculo de estadísticas ORIGIN (por colector)
@@ -141,6 +145,7 @@ Para cada colector se calculan:
 - Estadísticas mensuales:
 
    Total de prefijos
+  
    Distribución ORIGIN (IGP / INCOMPLETE / EGP)
 
 - Resumen anual:
