@@ -86,9 +86,6 @@ Generación de estadísticas ORIGIN:
 - Promedios anuales
 - Por país (CC)
 
-Análisis comparativo entre colectores.
-
-Identificación de peers con impacto significativo en los resultados.
 
 El detalle completo del pipeline se encuentra en:
 📄 docs/methodology.md
