@@ -108,6 +108,27 @@ pip install pytricia
 → Computes daily ORIGIN statistics (time-series analysis)
 
 
+
+## 🔍 ORIGIN Categories
+
+- IGP  
+- INCOMPLETE  
+- EGP  
+- MIXED → prefix observed with different ORIGIN values across paths  
+
+
+
+## 📊 Example Result
+
+BR_RIO:  
+MIXED ≈ 90%  
+
+CL:  
+MIXED ≈ 0%  
+  
+→ Different collectors observe completely different routing behavior  
+
+
 ---
 
 
