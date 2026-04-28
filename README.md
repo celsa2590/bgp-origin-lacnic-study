@@ -183,7 +183,12 @@ python3 scripts/06_rpki_correlation.py \
 
 8. Daily analysis (optional)  
 
-Example for April 2026:
+Daily analysis allows:  
+- temporal stability evaluation  
+- anomaly detection  
+- operational behavior analysis  
+
+Example for April 2026:  
 ./scripts/run_daily_april_2026.sh
 
 ### 📊 Key Findings  
@@ -200,6 +205,13 @@ EGP is still used operationally in modern networks
 This project analyzes control-plane data only
 Results depend on collector visibility
 RPKI snapshots must match the same period as BGP data
+
+## ⚠️ Limitations
+
+- Results depend on collector visibility  
+- Only control-plane data is analyzed  
+- No data-plane validation  
+- RPKI snapshots must match BGP timeline  
 
 ### 📬 Author
 
