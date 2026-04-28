@@ -5,6 +5,7 @@ outputs/
 outputs_daily/
 stats/
 stats_daily/
+scripts_backup/
 
 # Temporales
 *.bz2
