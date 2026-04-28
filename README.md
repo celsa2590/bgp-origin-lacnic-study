@@ -1,173 +1,135 @@
-# BGP ORIGIN en la práctica  
-## Análisis de inconsistencias observadas en prefijos LACNIC
+# 📊 BGP ORIGIN Behavior in the LACNIC Region
 
-Este repositorio documenta un estudio reproducible sobre el uso del atributo **BGP ORIGIN** en prefijos pertenecientes a la región **LACNIC**, a partir del análisis de tablas BGP (RIBs) obtenidas desde distintos colectores públicos.
+## Overview
 
-El trabajo analiza la distribución de los valores **IGP**, **INCOMPLETE** y **EGP**, su evolución temporal y las diferencias observadas entre colectores, países y peers.
+This project analyzes the behavior of the BGP **ORIGIN attribute** across multiple route collectors in the LACNIC region.
 
----
+The study focuses on:
 
-## 🎯 Objetivos del estudio
-
-- Analizar el uso real del atributo **BGP ORIGIN** en prefijos LACNIC.
-- Identificar inconsistencias del atributo entre distintos colectores de rutas.
-- Evaluar la evolución temporal del atributo (mensual y anual).
-- Obtener estadísticas agregadas por país (CC).
-- Identificar el impacto de decisiones operativas de ciertos peers en los resultados globales.
-- Proveer un **pipeline reproducible** para la comunidad técnica.
+- Consistency of ORIGIN across collectors
+- Temporal stability (monthly and daily)
+- Identification of strong inconsistency cases
+- Correlation between ORIGIN and **RPKI validation**
 
 ---
 
-## 📦 Fuentes de datos
+## 🎯 Objectives
 
-### Delegated files (LACNIC)
-Archivos oficiales de asignaciones de prefijos IPv4 e IPv6:
-https://ftp.lacnic.net/pub/stats/lacnic/
+- Evaluate whether ORIGIN is consistent across the Internet
+- Identify prefixes with conflicting ORIGIN values
+- Analyze behavior differences per collector
+- Determine whether inconsistencies are related to RPKI
+
+---
+
+## 📦 Data Sources
+
+### BGP Data
+- RouteViews collectors:
+  - CL (Chile)
+  - MX (Mexico)
+  - BR_FOR (Fortaleza)
+  - BR_RIO (Rio de Janeiro)
+  - PE (Peru)
+
+### Allocation Data
+- LACNIC delegated files:
+https://ftp.lacnic.net/pub/stats/lacnic/archive/
 
 
-Ejemplo:
-```bash
+### RPKI Data
+- Historical ROAs:
+https://ftp.ripe.net/rpki/lacnic.tal/
+
+
+---
+
+## ⚙️ Pipeline
+
+```text
+01 → Convert RIB to text (bgpdump)
+02 → Filter LACNIC prefixes
+03 → Compute ORIGIN statistics
+05 → Detect strong inconsistency cases
+06 → Correlate ORIGIN with RPKI
+07 → Aggregate results
+08 → Daily analysis (optional)
+```
+
+##📁 Repository Structure
+scripts/        → analysis scripts
+data/           → input data (not versioned)
+outputs/        → filtered prefixes (not versioned)
+stats/          → analysis results
+stats_daily/    → daily analysis outputs
+docs/           → methodology and notes
+
+Note: Large datasets (RIBs, outputs) are intentionally excluded from the repository.
+
+##🔧 Requirements
+Install dependencies:
+apt install bgpdump
+pip install pytricia
+
+##🚀 How to Reproduce the Analysis
+1. Download RIB
+
+Example:
+wget https://archive.routeviews.org/route-views.chile/bgpdata/2025.01/RIBS/rib.20250101.0000.bz2
+
+2. Convert to text
+./scripts/01_dump_rib_to_text.sh rib.bz2 output_dir CL
+
+3. Download delegated file
 wget https://ftp.lacnic.net/pub/stats/lacnic/archive/2025/delegated-lacnic-20250101
-```
 
-## RIBs BGP (RouteViews / RIS)
+4. Filter LACNIC prefixes
+python3 scripts/02_filter_lacnic_prefixes.py \
+  --rib data/text/CL/CL_20250101_0000.txt \
+  --delegated data/delegated/2025/delegated-lacnic-202501 \
+  --collector CL \
+  --out-dir outputs/CL
 
-- Tablas BGP completas desde colectores públicos:
-
-https://archive.routeviews.org/route-views.chile/bgpdata/2025.01/RIBS/
-
-## 🧱 Estructura del repositorio
-
-bgp-origin-lacnic-study/
-
-├── colectores/          # RIBs convertidos a texto, organizados por colector
-
-├── delegated_lacnic/    # Archivos delegated-lacnic por año
-
-├── scripts/             # Scripts de procesamiento y análisis
-
-├── outputs/             # RIBs filtrados (solo prefijos LACNIC, v4/v6)
-
-├── stats/               # Resultados estadísticos (mensual, anual, por país)
-
-├── docs/                # Documentación metodológica
-
-├── README.md
-
-└── .gitignore
-
-
-⚠️ Los directorios colectores/, outputs/ y stats/ no se versionan por contener grandes volúmenes de datos.
-
-
-## 🛠️ Dependencias
-
-- bgpdump
-- Python ≥ 3.8
-- Herramientas estándar de Unix (awk, grep, sort, uniq)
-- Instalación de bgpdump (Debian/Ubuntu):
-
-```bash
-sudo apt install bgpdump
-```
-
-## 🔬 Metodología (resumen)
-
-Descarga de archivos delegated-lacnic por mes del año seleccionado.
-
-Descarga de RIBs BGP por colector y mes.
-
-Conversión de RIBs a texto usando bgpdump.
-
-Filtrado de prefijos exclusivamente LACNIC (IPv4 e IPv6).
-
-Generación de estadísticas ORIGIN:
-- Por mes
-- Promedios anuales
-- Por país (CC)
-
-
-El detalle completo del pipeline se encuentra en:
-📄 docs/methodology.md
-
-## ▶️ Ejecución básica
-
-Filtrar RIBs a prefijos LACNIC (por mes)
-
-```bash
-
-./scripts/process_ribs_lacnic_by_month.sh \
-  colectores/RIS_UY/ \
-  delegated_lacnic/2025/ \
-  outputs/RIS_UY_lacnic_txt
-```
-
-Genera, por cada mes:
-
-*.lacnic.v4.txt
-
-*.lacnic.v6.txt
-
-
-Estadísticas ORIGIN por mes y anual
-IPv4:
-
-```bash
-python3 scripts/origin_stats_by_month_and_annual.py \
-  --in-dir outputs/RIS_UY_lacnic_txt \
+5. Compute ORIGIN statistics
+python3 scripts/03_origin_monthly_annual.py \
+  --in-dir outputs/CL \
   --only v4 \
-  --out-dir stats/RIS_UY \
-  --collector RIS_UY \
+  --out-dir stats/CL \
+  --collector CL \
   --annual-mode avg
-```
 
-IPv6:
-
-```bash
-python3 scripts/origin_stats_by_month_and_annual.py \
-  --in-dir outputs/RIS_UY_lacnic_txt \
-  --only v6 \
-  --out-dir stats/RIS_UY \
-  --collector RIS_UY \
-  --annual-mode avg
-```
-
-Estadísticas por país (CC)
-
-```bash
-python3 scripts/origin_stats_by_cc.py \
-  --in-dir outputs/BRFOR_lacnic_txt \
+6. Strong inconsistency cases
+python3 scripts/05_strong_cases.py \
+  --in-dirs outputs/CL outputs/MX outputs/BR_RIO \
   --only v4 \
-  --out-dir stats/BRFOR \
-  --collector BRFOR \
-  --scope all \
-  --top 10
-```
+  --out-dir stats/strong_cases
 
-## ⚠️ Consideraciones importantes
+7. RPKI correlation
+python3 scripts/06_rpki_correlation.py \
+  --in-dirs outputs/CL outputs/MX outputs/BR_RIO \
+  --only v4 \
+  --roa-dir data/rpki_raw \
+  --out-dir stats/rpki/v4 \
+  --scope all
 
-- El atributo ORIGIN en algunos casos es modificado por operadores como parte de decisiones operativas internas.
-- Cambios en la composición de peers de un colector pueden alterar significativamente las estadísticas agregadas.
+8. Daily analysis (optional)
+Example for April 2026:
+./scripts/run_daily_april_2026.sh
 
-## 📣 Contexto académico y operativo
+📊 Key Findings
+ORIGIN is not globally consistent
+Behavior strongly depends on the collector
+~8% of prefixes show persistent inconsistencies
+RPKI validation does not explain ORIGIN differences
+INCOMPLETE often correlates with higher RPKI validity
+EGP is still used operationally in modern networks
 
-Este trabajo se inspira y dialoga con discusiones presentadas en foros técnicos como RIPE y LACNIC, incluyendo charlas sobre el uso práctico del atributo BGP ORIGIN en redes reales.
+##Notes
+This project analyzes control-plane data only
+Results depend on collector visibility
+RPKI snapshots must match the same period as BGP data
 
-El objetivo no es juzgar configuraciones, sino entender y visibilizar prácticas operativas existentes.
-
-
-## 👤 Autora
+##📬 Author
 
 Celsa Sánchez
-
-Ingeniera en Telecomunicaciones
-
 NIC Chile
-
-Embajadora I+D LACNIC 2024
-
-
-## 📄 Licencia
-
-Este repositorio se publica con fines educativos y de investigación.
-Los datos BGP pertenecen a sus respectivas fuentes originales.
