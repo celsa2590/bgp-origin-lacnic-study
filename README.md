@@ -73,7 +73,9 @@ docs/           → methodology and notes
 
 Note: Large datasets (RIBs, outputs) are intentionally excluded from the repository.
 
-###🔧 Requirements
+---
+
+### 🔧 Requirements
 
 Install dependencies:  
 
@@ -106,7 +108,10 @@ pip install pytricia
 → Computes daily ORIGIN statistics (time-series analysis)
 
 
-###🚀 How to Reproduce the Analysis  
+---
+
+
+### 🚀 How to Reproduce the Analysis  
 
 1. Download RIB
 
@@ -160,7 +165,7 @@ python3 scripts/06_rpki_correlation.py \
 Example for April 2026:
 ./scripts/run_daily_april_2026.sh
 
-###📊 Key Findings  
+### 📊 Key Findings  
 
 ORIGIN is not globally consistent
 Behavior strongly depends on the collector
@@ -169,13 +174,13 @@ RPKI validation does not explain ORIGIN differences
 INCOMPLETE often correlates with higher RPKI validity
 EGP is still used operationally in modern networks
 
-###Notes  
+### Notes  
 
 This project analyzes control-plane data only
 Results depend on collector visibility
 RPKI snapshots must match the same period as BGP data
 
-###📬 Author
+### 📬 Author
 
 Celsa Sánchez
 NIC Chile
