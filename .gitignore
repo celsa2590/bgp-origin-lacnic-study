@@ -2,10 +2,19 @@
 colectores/
 delegated_lacnic/
 outputs/
+outputs_daily/
 stats/
+stats_daily/
 
 # Temporales
 *.bz2
 *.txt
 *.log
+*.gz
+*.xz
+
+# Python
 __pycache__/
+*.pyc
+.venv/
+venv/
