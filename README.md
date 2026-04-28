@@ -57,6 +57,7 @@ https://ftp.ripe.net/rpki/lacnic.tal/
 ```
 
 ##📁 Repository Structure
+
 scripts/        → analysis scripts
 data/           → input data (not versioned)
 outputs/        → filtered prefixes (not versioned)
@@ -67,30 +68,61 @@ docs/           → methodology and notes
 Note: Large datasets (RIBs, outputs) are intentionally excluded from the repository.
 
 ##🔧 Requirements
+
 Install dependencies:
 apt install bgpdump
 pip install pytricia
 
-##🚀 How to Reproduce the Analysis
+## 🧩 Scripts Description
+
+01_dump_rib_to_text.sh  
+→ Converts RIB dumps to text format using bgpdump
+
+02_filter_lacnic_prefixes.py  
+→ Filters only LACNIC prefixes using delegated files
+
+03_origin_monthly_annual.py  
+→ Computes ORIGIN statistics (IGP, INCOMPLETE, EGP, MIXED)
+
+05_strong_cases.py  
+→ Detects prefixes with inconsistent ORIGIN across collectors
+
+06_rpki_correlation.py  
+→ Correlates ORIGIN with RPKI validation
+
+07_rpki_summary_from_reports.py  
+→ Aggregates RPKI results across collectors
+
+08_origin_daily_stats.py  
+→ Computes daily ORIGIN statistics (time-series analysis)
+
+
+##🚀 How to Reproduce the Analysis  
+
 1. Download RIB
 
-Example:
+Example:  
+
 wget https://archive.routeviews.org/route-views.chile/bgpdata/2025.01/RIBS/rib.20250101.0000.bz2
 
-2. Convert to text
+2. Convert to text  
+
 ./scripts/01_dump_rib_to_text.sh rib.bz2 output_dir CL
 
-3. Download delegated file
+3. Download delegated file  
+
 wget https://ftp.lacnic.net/pub/stats/lacnic/archive/2025/delegated-lacnic-20250101
 
-4. Filter LACNIC prefixes
+4. Filter LACNIC prefixes  
+
 python3 scripts/02_filter_lacnic_prefixes.py \
   --rib data/text/CL/CL_20250101_0000.txt \
   --delegated data/delegated/2025/delegated-lacnic-202501 \
   --collector CL \
   --out-dir outputs/CL
 
-5. Compute ORIGIN statistics
+5. Compute ORIGIN statistics  
+
 python3 scripts/03_origin_monthly_annual.py \
   --in-dir outputs/CL \
   --only v4 \
@@ -98,13 +130,15 @@ python3 scripts/03_origin_monthly_annual.py \
   --collector CL \
   --annual-mode avg
 
-6. Strong inconsistency cases
+6. Strong inconsistency cases  
+
 python3 scripts/05_strong_cases.py \
   --in-dirs outputs/CL outputs/MX outputs/BR_RIO \
   --only v4 \
   --out-dir stats/strong_cases
 
-7. RPKI correlation
+7. RPKI correlation  
+
 python3 scripts/06_rpki_correlation.py \
   --in-dirs outputs/CL outputs/MX outputs/BR_RIO \
   --only v4 \
@@ -112,11 +146,13 @@ python3 scripts/06_rpki_correlation.py \
   --out-dir stats/rpki/v4 \
   --scope all
 
-8. Daily analysis (optional)
+8. Daily analysis (optional)  
+
 Example for April 2026:
 ./scripts/run_daily_april_2026.sh
 
-📊 Key Findings
+📊 Key Findings  
+
 ORIGIN is not globally consistent
 Behavior strongly depends on the collector
 ~8% of prefixes show persistent inconsistencies
@@ -124,7 +160,8 @@ RPKI validation does not explain ORIGIN differences
 INCOMPLETE often correlates with higher RPKI validity
 EGP is still used operationally in modern networks
 
-##Notes
+##Notes  
+
 This project analyzes control-plane data only
 Results depend on collector visibility
 RPKI snapshots must match the same period as BGP data
