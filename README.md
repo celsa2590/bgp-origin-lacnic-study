@@ -200,11 +200,6 @@ RPKI validation does not explain ORIGIN differences
 INCOMPLETE often correlates with higher RPKI validity
 EGP is still used operationally in modern networks
 
-### Notes  
-
-This project analyzes control-plane data only
-Results depend on collector visibility
-RPKI snapshots must match the same period as BGP data
 
 ## ⚠️ Limitations
 
