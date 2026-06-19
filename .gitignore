@@ -1,18 +1,24 @@
-# Datos grandes y no versionables
+# Input data
+data/
 colectores/
 delegated_lacnic/
+
+# Generated outputs
 outputs/
 outputs_daily/
 stats/
 stats_daily/
+
+# Backups
 scripts_backup/
 
-# Temporales
+# Large/raw files
 *.bz2
-*.txt
-*.log
 *.gz
 *.xz
+*.txt
+*.csv
+*.log
 
 # Python
 __pycache__/
